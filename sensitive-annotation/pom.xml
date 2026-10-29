@@ -5,11 +5,12 @@
     <parent>
         <artifactId>sensitive</artifactId>
         <groupId>com.github.houbb</groupId>
-        <version>0.0.15</version>
+        <version>1.9.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>sensitive-annotation</artifactId>
+    <name>sensitive-annotation</name>
 
     <dependencies>
         <!--========================= SELF =========================-->

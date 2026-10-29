@@ -1,9 +1,6 @@
 package com.github.houbb.sensitive.core.api.strategory;
 
-import com.github.houbb.heaven.util.lang.ObjectUtil;
 import com.github.houbb.sensitive.api.IContext;
-import com.github.houbb.sensitive.api.IStrategy;
-import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyUtil;
 
 /**
  * 邮箱脱敏策略
@@ -12,11 +9,16 @@ import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyUtil;
  * @author binbin.hou
  * date 2019/1/2
  */
-public class StrategyEmail implements IStrategy {
+public class StrategyEmail extends AbstractStringStrategy {
 
     @Override
-    public Object des(Object original, IContext context) {
-        return SensitiveStrategyUtil.email(ObjectUtil.objectToString(original));
+    protected int getBeforeMaskLen(Object original, IContext context, char[] chars) {
+        return 2;
+    }
+
+    @Override
+    protected int getAfterMaskLen(Object original, IContext context, char[] chars) {
+        return 4;
     }
 
 }

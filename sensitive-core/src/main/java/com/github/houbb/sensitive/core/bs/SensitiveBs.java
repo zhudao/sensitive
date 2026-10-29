@@ -1,13 +1,16 @@
 package com.github.houbb.sensitive.core.bs;
 
-import com.github.houbb.deep.copy.api.IDeepCopy;
-import com.github.houbb.deep.copy.fastjson.FastJsonDeepCopy;
+import com.github.houbb.hash.api.IHash;
+import com.github.houbb.hash.core.core.hash.Hashes;
 import com.github.houbb.heaven.support.instance.impl.Instances;
 import com.github.houbb.heaven.util.common.ArgUtil;
+import com.github.houbb.sensitive.api.IDeepCopy;
 import com.github.houbb.sensitive.api.ISensitive;
 import com.github.houbb.sensitive.api.ISensitiveConfig;
 import com.github.houbb.sensitive.core.api.SensitiveService;
 import com.github.houbb.sensitive.core.support.config.DefaultSensitiveConfig;
+import com.github.houbb.sensitive.core.support.config.SensitiveConfig;
+import com.github.houbb.sensitive.core.support.deepcopy.FastJson2DeepCopy;
 
 /**
  * 脱敏引导类
@@ -22,13 +25,26 @@ public final class SensitiveBs {
      * 深度拷贝
      * @since 0.0.13
      */
-    private IDeepCopy deepCopy = FastJsonDeepCopy.getInstance();
+    private IDeepCopy deepCopy = FastJson2DeepCopy.getInstance();
 
     /**
      * 脱敏实现
      * @since 0.0.9
      */
-    private ISensitive sensitive = Instances.singleton(SensitiveService.class);
+    private final ISensitive sensitive = new SensitiveService();
+
+    /**
+     * 哈希策略
+     * @since 1.1.0
+     */
+    private IHash hash = Hashes.empty();
+
+    /**
+     * 是否显示哈希值
+     * null 表示使用全局配置
+     * @since 1.8.0
+     */
+    private Boolean showHash = null;
 
     /**
      * 新建实例
@@ -37,6 +53,24 @@ public final class SensitiveBs {
      */
     public static SensitiveBs newInstance() {
        return new SensitiveBs();
+    }
+
+    public SensitiveBs hash(IHash hash) {
+        ArgUtil.notNull(hash, "hash");
+
+        this.hash = hash;
+        return this;
+    }
+
+    /**
+     * 设置是否显示哈希值
+     * @param showHash 是否显示哈希值
+     * @return this
+     * @since 1.8.0
+     */
+    public SensitiveBs showHash(Boolean showHash) {
+        this.showHash = showHash;
+        return this;
     }
 
     /**
@@ -87,8 +121,14 @@ public final class SensitiveBs {
      * @since 0.0.9
      */
     private ISensitiveConfig buildConfig() {
+        // 确定最终的 showHash 值
+        // 编程式配置优先级最高
+        boolean finalShowHash = (showHash != null) ? showHash : SensitiveConfig.showHash();
+
         return DefaultSensitiveConfig.newInstance()
-                .deepCopy(deepCopy);
+                .deepCopy(deepCopy)
+                .hash(hash)
+                .showHash(finalShowHash);
     }
 
 }

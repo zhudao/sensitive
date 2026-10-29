@@ -1,6 +1,6 @@
 package com.github.houbb.sensitive.api;
 
-import com.github.houbb.deep.copy.api.IDeepCopy;
+import com.github.houbb.hash.api.IHash;
 
 /**
  * 脱敏配置接口
@@ -15,6 +15,22 @@ public interface ISensitiveConfig {
      * @since 0.0.9
      */
     IDeepCopy deepCopy();
+
+    /**
+     * 哈希策略
+     * @return 结果
+     * @since 1.1.0
+     */
+    IHash hash();
+
+    /**
+     * 是否显示哈希值
+     * @return 是否显示哈希值，默认 true
+     * @since 1.8.0
+     */
+    default boolean showHash() {
+        return true;
+    }
 
 }
 

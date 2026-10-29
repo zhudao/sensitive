@@ -7,12 +7,15 @@
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.15</version>
+    <version>1.9.1</version>
     <modules>
         <module>sensitive-annotation</module>
         <module>sensitive-api</module>
         <module>sensitive-core</module>
         <module>sensitive-test</module>
+        <module>sensitive-log4j2</module>
+        <module>sensitive-logback</module>
+        <module>sensitive-test2</module>
     </modules>
 
     <properties>
@@ -32,15 +35,18 @@
 
         <!--============================== MAIN ==============================-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.compiler.level>1.7</project.compiler.level>
+        <project.compiler.level>8</project.compiler.level>
 
         <!--============================== INTER ==============================-->
-        <heaven.version>0.1.162</heaven.version>
-        <deep-copy.version>0.0.1</deep-copy.version>
+        <heaven.version>0.4.0</heaven.version>
+        <fastjson2.version>2.0.61</fastjson2.version>
+        <hash.version>0.0.7</hash.version>
+        <chars-scan.version>1.30.0</chars-scan.version>
 
         <!--============================== OTHER ==============================-->
         <junit.version>4.13.1</junit.version>
-        <fastjson.version>1.2.83</fastjson.version>
+        <log4j2.version>2.17.1</log4j2.version>
+        <logback.version>1.2.3</logback.version>
     </properties>
 
     <dependencyManagement>
@@ -64,6 +70,18 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sensitive-log4j2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sensitive-logback</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!--========================= INTER =========================-->
             <dependency>
                 <groupId>com.github.houbb</groupId>
@@ -73,15 +91,20 @@
 
             <dependency>
                 <groupId>com.github.houbb</groupId>
-                <artifactId>deep-copy-api</artifactId>
-                <version>${deep-copy.version}</version>
+                <artifactId>hash-api</artifactId>
+                <version>${hash.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.houbb</groupId>
-                <artifactId>deep-copy-fastjson</artifactId>
-                <version>${deep-copy.version}</version>
+                <artifactId>hash-core</artifactId>
+                <version>${hash.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.github.houbb</groupId>
+                <artifactId>chars-scan</artifactId>
+                <version>${chars-scan.version}</version>
+            </dependency>
             <!--========================= OTHER =========================-->
             <dependency>
                 <groupId>junit</groupId>
@@ -91,9 +114,29 @@
             </dependency>
 
             <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
-                <version>${fastjson.version}</version>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson2.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j2.version}</version>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j2.version}</version>
+                <optional>true</optional>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+                <optional>true</optional>
             </dependency>
 
         </dependencies>
@@ -111,7 +154,16 @@
                     <target>${project.compiler.level}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <compilerArgument>-proc:none</compilerArgument>
+                    <executable>D:\tools\jdk\jdk1.8.0_192\bin\javac</executable>
+                    <fork>true</fork>
                 </configuration>
+            </plugin>
+
+            <!-- Surefire -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
             </plugin>
 
             <!-- Javadoc -->
@@ -187,6 +239,16 @@
             <id>release</id>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.8.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                        </configuration>
+                    </plugin>
+
                     <!-- Source -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -206,6 +268,14 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>${plugin.maven-javadoc-plugin.version}</version>
+                        <configuration>
+                            <encoding>UTF-8</encoding>
+                            <charset>UTF-8</charset>
+                            <docencoding>UTF-8</docencoding>
+                            <additionalJOptions>
+                                <additionalJOption>-Xdoclint:none</additionalJOption>
+                            </additionalJOptions>
+                        </configuration>
                         <executions>
                             <execution>
                                 <phase>package</phase>
@@ -229,45 +299,8 @@
                             </execution>
                         </executions>
                     </plugin>
-
-                    <!--=================================== coveralls START ===================================-->
-                    <!--mvn cobertura:cobertura coveralls:report -DrepoToken=yourcoverallsprojectrepositorytoken-->
-                    <plugin>
-                        <groupId>org.eluder.coveralls</groupId>
-                        <artifactId>coveralls-maven-plugin</artifactId>
-                        <version>${plugin.coveralls.version}</version>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>cobertura-maven-plugin</artifactId>
-                        <version>${plugin.cobertura.version}</version>
-                        <configuration>
-                            <format>xml</format>
-                            <maxmem>256m</maxmem>
-                            <!-- aggregated reports for multi-module projects -->
-                            <aggregate>true</aggregate>
-                            <instrumentation>
-                                <excludes>
-                                    <exclude>**/*Test.class</exclude>
-                                </excludes>
-                            </instrumentation>
-                        </configuration>
-                    </plugin>
-                    <!--=================================== coveralls END ===================================-->
-
                 </plugins>
             </build>
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>oss</id>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-                </snapshotRepository>
-                <repository>
-                    <id>oss</id>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                </repository>
-            </distributionManagement>
         </profile>
     </profiles>
 

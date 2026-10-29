@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" packages = "com.github.houbb.sensitive.log4j2.rewrite">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        <Rewrite name="rewrite">
+            <AppenderRef ref="Console"/>
+
+            <SensitiveRewritePolicy/>
+        </Rewrite>
+    </Appenders>
+    <Loggers>
+        <Root level="DEBUG">
+<!--            <AppenderRef ref="Console"/>-->
+            <AppenderRef ref="rewrite" />
+        </Root>
+    </Loggers>
+</Configuration>

@@ -10,9 +10,9 @@ ECHO "============================= RELEASE START..."
 
 :: 版本号信息(需要手动指定)
 :::: 旧版本名称
-SET version=0.0.15
+SET version=1.7.1
 :::: 新版本名称
-SET newVersion=0.0.16
+SET newVersion=1.7.1
 :::: 组织名称
 SET groupName=com.github.houbb
 :::: 项目名称
@@ -23,6 +23,8 @@ SET projectName=sensitive
 SET snapshot_version=%version%"-SNAPSHOT"
 :::: 新的版本号
 SET release_version=%version%
+
+:: $env:JAVA_HOME="D:\tool\jdk\jdk-1.8";
 
 call mvn versions:set -DgroupId=%groupName% -DartifactId=%projectName% -DoldVersion=%snapshot_version% -DnewVersion=%release_version%
 call mvn -N versions:update-child-modules
